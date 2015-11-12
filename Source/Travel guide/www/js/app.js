@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var app=angular.module('starter', ['ionic','ngCordova','services', 'starter.controllers'])
+var app=angular.module('starter', ['ionic','ngCordova','services', 'starter.controllers','services.UserServices'])
 
 //app.run(function($ionicPlatform) {
 //  $ionicPlatform.ready(function() {
@@ -26,20 +26,61 @@ var app=angular.module('starter', ['ionic','ngCordova','services', 'starter.cont
 //   
 //})
 var userLoginMode;
-app.config(function($stateProvider, $urlRouterProvider) {
+app.config(function($httpProvider,$stateProvider,$urlRouterProvider) {
+    delete $httpProvider.defaults.headers.common["X-Requested-With"]
+
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
+    
   $stateProvider
     
-    .state('tabs', {
-      url: '/tab',
-      abstract: true,
-      templateUrl: 'templates/tabs.html'
-    })
-   .state('tabs.home',{
+  .state('main',{
+  url:'/main',
+      abstract:true,
+      template:'<ion-nav-view name="Dashboard"></ion-nav-view>'
+  })
+//    .state('main.tabs', {
+//      url: '/tab',
+//      abstract: true,
+//      views:{
+//          'Tab':{
+//              
+//      templateUrl: 'templates/tabs.html'
+//          }
+//      }
+//    })
+  .state('login',{
+  url:'/login',
+        
+        
+          templateUrl: 'templates/login.html',
+          controller: 'loginCtrl'
+        
+    
+  })
+  .state('register',{
+url:'/register',
+       
+        templateUrl:'templates/register.html',
+            controller:'registrationCtrlr'
+       
+})
+  
+  .state('main.dashboard',
+         {
+      url:'/dahsboard',
+      abstract:true,
+      views:{
+       'Dashboard':{   
+      templateUrl:'templates/tabs-dashboard.html',
+      }
+      }
+  })
+  
+  .state('main.dashboard.home',{
   url:'/home',
       views:{
       'Home':{
@@ -48,18 +89,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
       }
   })
-  .state('tabs.login',{
-  url:'/login',
-        views: {
-        'Login': {
-          templateUrl: 'templates/login.html',
-          controller: 'loginCtrl'
-        }
-      }
-     
-  })
- 
-    .state('tabs.task',{
+    .state('main.dashboard.task',{
         url:'/task',
           views: {
         'Task': {
@@ -69,17 +99,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 
-.state('tabs.register',{
-url:'/register',
-    views:{
-        'Register':{
-        templateUrl:'templates/register.html',
-            controller:'registrationCtrlr'
-        }
-    }
-})
 
-.state('tabs.translator', {
+
+.state('main.dashboard.translator', {
     url: '/translator',
     views: {
       'Translator': {
@@ -88,7 +110,35 @@ url:'/register',
       }
     }
   })
-  .state('tabs.weather', {
+  .state('main.dashboard.Currency', {
+    url: '/Currency',
+    views: {
+      'Currency': {
+        templateUrl: 'templates/CurrencyConverter.html',
+        controller: 'CurrencyConverter'
+      }
+    }
+  })
+  .state('main.dashboard.Places', {
+    url: '/Places',
+    views: {
+      'Places': {
+        templateUrl: 'templates/Places.html',
+        controller: 'Places'
+      }
+    }
+  })
+  .state('main.dashboard.Accomdation', {
+    url: '/Accomdation',
+    views: {
+      'Accomdation': {
+        templateUrl: 'templates/Accomdation.html',
+        controller: 'Accomdation'
+      }
+    }
+  })
+  
+  .state('main.dashboard.weather', {
     url: '/weather',
     views: {
       'Weather': {
@@ -101,7 +151,7 @@ url:'/register',
 
   // if none of the above states are matched, use this as the fallback
   
-  $urlRouterProvider.otherwise('/tab/login');
+  $urlRouterProvider.otherwise('/login');
   
 
 });

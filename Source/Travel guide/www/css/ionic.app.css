@@ -9321,3 +9321,13 @@ border-radius : 25px;
 .button-shape{
 border-radius : 15px;
 }
+.infoWindowContent {
+  font-size:  10px;
+  border-top: 0.1px solid #ccc;
+  padding-top: 1px;
+}
+#map {
+  position:absolute;  
+  height:400%; 
+  width:100%;
+}

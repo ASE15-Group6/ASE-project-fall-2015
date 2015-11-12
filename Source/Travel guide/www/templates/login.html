@@ -2,7 +2,10 @@
     <ion-view view-title="Login"  ng-controller="loginCtrl">
         <ion-header-bar class="bar-balanced">
         <h1 class="title">Travel Guide</h1>
-        <button class="button button-clear button-dark" ng-click="redirectToRegistration()">Register</button>   
+            
+        <button class="button button-icon" ng-click="redirectToRegistration()">Register
+              <i class="icon ion-person-add"></i>
+            </button>   
         </ion-header-bar>
     <ion-content padding="true" class="has-header">
          
@@ -24,14 +27,12 @@
                 </i>
                 Login with facebook
                 </button>
-<!--
-              <button class="button button-assertive button-block" ng-click="googlePlusLogin()">       
+              <button class="button button-assertive button-block button-shape" ng-click="googleSignIn()">       
            <i class="icon ion-social-googleplus-outline">
                 
                 </i>
                 Sign in with Google
                 </button>
--->
                         </form>
         
     </ion-content>

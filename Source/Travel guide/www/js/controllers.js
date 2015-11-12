@@ -1,6 +1,6 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ionic','services.UserServices'])
 
-.controller('LanguageTranslatorController', function($scope) {
+.controller('LanguageTranslatorController', function($scope,$http) {
    $scope.convertText =function()
           {
            var SourceText= document.getElementById("SourceText").value.toString();
@@ -9,28 +9,222 @@ angular.module('starter.controllers', [])
             var DestinationText=document.getElementById("DestinationText").value.toString();
             var DestinationLanguage = document.getElementById("DestinationLanguage");
             DestinationLanguage =DestinationLanguage.options[DestinationLanguage.selectedIndex].value;
-              $.ajax({
-		url: 'http://www.frengly.com/',		
-		data: {
-			src: SourceLanguage,
-			dest: DestinationLanguage,
-			text: SourceText,
-			outformat: 'json',
-			email: "pradeepchaitu1992@gmail.com",
-			password: "9989807198"
-		},			    	    	    
-		success: function(data){
-           document.getElementById("DestinationText").value=data.translation;
-		},
-		error: function (errormessage) {
-			 $('#responseDiv').html(errormessage);
-		}
-	});	
-};
-})
- .controller('googlemapoutput', function ($scope,$http) {
-  
-    $scope.getWeather = function() {       
+
+    $http({
+    method: 'GET',
+    url : 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20151023T145251Z.bf1ca7097253ff7e.c0b0a88bea31ba51f72504cc0cc42cf891ed90d2&text='+SourceText+'&lang='+SourceLanguage+'-'+DestinationLanguage+'&[format=plain]&[options=1]&[callback=set]',
+    contentType: "application/json"
+}).success(function(response) {
+    document.getElementById("DestinationText").value=response.text;
+        });
+};   
+}) 
+.controller("CurrencyConverter", function ($scope, $http, $httpParamSerializerJQLike) {
+$scope.Currency = function() {
+           var SourceValue=document.getElementById("SourceValue").value;
+           var SourceCurrency = document.getElementById("SourceCurrency");
+           SourceCurrency=SourceCurrency.options[SourceCurrency.selectedIndex].value;
+           var TargetCurrency = document.getElementById("TargetCurrency");
+           TargetCurrency =TargetCurrency.options[TargetCurrency.selectedIndex].value;
+$http({
+    method: 'GET',
+    url : 'http://api.fixer.io/latest?symbols='+SourceCurrency+','+TargetCurrency+'',
+    contentType: "application/json"
+}).success(function(response) {
+    var list=response.rates;
+
+    var TargetRate=response.rates[TargetCurrency];
+    var SourceRate=response.rates[SourceCurrency];
+    
+    BaseRate=TargetRate/SourceRate;    
+    OutputValue=SourceValue*BaseRate;
+   
+    document.getElementById("TargetValue").value=OutputValue;
+        });
+}; })
+.controller("Accomdation", function ($scope, $http) {
+        var place;
+        var autocomplete;
+    var mapOptions = {
+        zoom: 2,
+        center: new google.maps.LatLng(39.0997, -94.5783),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+
+
+    function setMarker(lati, longi)
+    {
+        var mapOptions = {
+            zoom: 12,
+            center: new google.maps.LatLng(lati, longi),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    }
+
+
+    $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    $scope.markers = [];
+
+    var infoWindow = new google.maps.InfoWindow();
+
+    function createMarker(info){
+
+        var marker = new google.maps.Marker({
+            map: $scope.map,
+            position: new google.maps.LatLng(info.position[0], info.position[1]),
+            title: info.title
+
+        });
+        marker.content = '<div class="infoWindowContent">' + info.vicinity + '</div>';
+
+        google.maps.event.addListener(marker, 'click', function(){
+            infoWindow.setContent('<h6>' + marker.title + '</h6>' + marker.content);
+            infoWindow.open($scope.map, marker);
+        });
+
+        $scope.markers.push(marker);
+    }  
+
+
+    $scope.openInfoWindow = function(e, selectedMarker){
+        e.preventDefault();
+        google.maps.event.trigger(selectedMarker, 'click');
+    }
+            var input = document.getElementById('placeInput');
+            autocomplete = new google.maps.places.Autocomplete(input);
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                 place = autocomplete.getPlace();
+            });
+        $scope.Accomdation = function() {       
+            place = autocomplete.getPlace();
+            var latitude = place.geometry.location.lat();
+            var longitude = place.geometry.location.lng();
+            $http.get('http://places.cit.api.here.com/places/v1/discover/explore?at='+latitude+','+longitude+'&cat=accommodation&app_id=e40DqLGqSKIEpEmrrtlz&app_code=VdHvRq3QQeaevUZQrmTwWg&tf=plain&pretty=true')
+                .success(function(sourcedata){
+                setMarker(latitude,longitude);
+               // var content="";               
+                for(var i=0;i<sourcedata.results.items.length;i++)
+                    {
+                        createMarker(sourcedata.results.items[i]);
+                    }
+//                document.getElementById("Accomdation").innerHTML=content;
+                console.log(sourcedata);
+            });       
+        };    
+    })
+.controller("Places", function ($scope, $http) {
+        var place;
+        var autocomplete;
+    
+    var mapOptions = {
+        zoom: 2,
+        center: new google.maps.LatLng(39.0997, -94.5783),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    
+     
+    
+    
+    
+    
+    function setMarker(lati, longi)
+    {
+        var mapOptions = {
+            zoom: 12,
+            center: new google.maps.LatLng(lati, longi),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    }
+    
+    
+    
+     
+    
+    
+
+   
+    $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+   
+    $scope.markers = [];
+
+    var infoWindow = new google.maps.InfoWindow();
+
+    function createMarker(info){
+
+        var marker = new google.maps.Marker({
+            map: $scope.map,
+            position: new google.maps.LatLng(info.position[0], info.position[1]),
+            title: info.title
+            
+        });
+    
+    
+   
+    
+        marker.content = '<div class="infoWindowContent">' + info.vicinity + '</div>';
+
+        google.maps.event.addListener(marker, 'click', function(){
+            infoWindow.setContent('<h6>' + marker.title + '</h6>' + marker.content);
+            infoWindow.open($scope.map, marker);
+        });
+
+        $scope.markers.push(marker);
+    }  
+        
+        
+        
+    
+      
+
+
+    $scope.openInfoWindow = function(e, selectedMarker){
+        e.preventDefault();
+        google.maps.event.trigger(selectedMarker, 'click');
+    }
+        
+
+    
+            var input = document.getElementById('pInput');
+            autocomplete = new google.maps.places.Autocomplete(input);
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                 place = autocomplete.getPlace();  
+            });
+    
+    
+        
+        $scope.Places = function() {       
+            place = autocomplete.getPlace();
+            var latitude = place.geometry.location.lat();
+            var longitude = place.geometry.location.lng();
+            $http.get('http://places.cit.api.here.com/places/v1/discover/explore?at='+latitude+','+longitude+'&app_id=e40DqLGqSKIEpEmrrtlz&app_code=VdHvRq3QQeaevUZQrmTwWg&tf=plain&pretty=true')
+                .success(function(sourcedata){
+                setMarker(latitude,longitude);
+                
+                for(var i=0;i<sourcedata.results.items.length;i++)
+                    {
+                        createMarker(sourcedata.results.items[i]);    
+                    }
+//     document.getElementById("Places").innerHTML=content;
+                console.log(sourcedata);
+            });     
+        };    
+   
+        
+           
+    })
+.controller('googlemapoutput', function ($scope,$http) {
+    var place;
+    var autocomplete;
+    var input = document.getElementById('searchLocation');
+    autocomplete = new google.maps.places.Autocomplete(input);
+    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+        place = autocomplete.getPlace();  
+    });
+    $scope.getWeather = function() {  
+        
      var location = document.getElementById("searchLocation").value;
         $http.get('http://api.openweathermap.org/data/2.5/forecast/daily?q='+location+'&mode=json&units=metric&cnt=7&appid=6592931011456bf7e824174e29720be8')
 .success(function(sourcedata){
@@ -45,7 +239,8 @@ angular.module('starter.controllers', [])
             for(var i=0;i<sourcedata.list.length;i++)
                 {
                     myArray.push({           
-                    dt: timeConverter(sourcedata.list[i].dt),
+                    dt:timeConverter(sourcedata.list[i].dt),
+                        //dt:sourcedata.list[i].dt,
                     min:sourcedata.list[i].temp.min,
                     max:sourcedata.list[i].temp.max,
                    //humidity:sourcedata.list[i].humidity
@@ -57,11 +252,21 @@ angular.module('starter.controllers', [])
 
 function timeConverter(UNIX_timestamp){
     var date = new Date(UNIX_timestamp*1000);
+
+    //date = new Date(date.setMonth(date.getMonth() + 1)*1000);
+    // var date = new Date(unix_timestamp*1000);
+    // hours part from the timestamp
     var years = date.getFullYear();
+    // minutes part from the timestamp
     var month = date.getMonth() +1;
+    //  alert(month);
+    // seconds part from the timestamp
     var mydate = date.getDate();
+    // will display time in 10:30:23 format
     var formattedTime = years + '-' + month + '-' + mydate;        
+
     return ''+formattedTime+'';   
+
 }
      
 function graph(myArray){
@@ -70,12 +275,22 @@ function graph(myArray){
         data: myArray,
         xkey:"dt",
         ykeys:['min', 'max'],
+        labels: ['Minimum', 'Maximum'],
+        xLabelFormat:function (d)
+         { 
+             return d.getDate()
+         },
         lineColors:['blue','red'],
         lineWidth:1,
         pointSize:2,
+        resize:true,
         grid:false,
-   //   pointFillColors:['white'],
-        labels: ['Minimum', 'Maximum']
+        ymin:'auto',
+        xLabels:'day',
+        xLabelAngle: 45,
+        resize:true,
+         hideHover:'true'
+        //postUnits:'C'
      });    
 }
 console.log(sourcedata);
@@ -87,45 +302,54 @@ console.log(sourcedata);
 })
 .controller('loginCtrl', function($scope, $state, $q, UserService, $ionicLoading,$log,$state,$http,$cordovaOauth) {
      var loggedUserName;
+     var userServicesFactory;
+    if(userServicesFactory==undefined || userServicesFactory==null)
+   userServicesFactory= getServiceFactory($http,$state,$log);
+        var userServices = userServicesFactory.createService("user");
     $scope.goToHome=function()
 {
         if(document.getElementById('txt_Uname')){
     $scope.userName=document.getElementById('txt_Uname').value;
       
-        document.getElementById('txt_Uname').value="";
+       // ;
         }
+        
           if(document.getElementById('txt_Pwd')){
     $scope.password= document.getElementById('txt_Pwd').value;
-        document.getElementById('txt_Pwd').value="";
+       //
           }
     if($scope.userName!=null && $scope.password!=null){
-    $http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/users?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
-		  method: "GET",
-		  contentType: "application/json"}).then(onGetUserRecord_sucess,onGetUserRecord_failure);
+//    $http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/users?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
+//		  method: "GET",
+//		  contentType: "application/json"}).then(onGetUserRecord_sucess,onGetUserRecord_failure);
+        $ionicLoading.show({
+          template: 'Logging in...'
+        });
+        
+        userServices.login($scope.userName,$scope.password,onGetUserRecord_sucess);
     }
     function onGetUserRecord_sucess(result)
     {
-        $scope.usersList=result.data;
+        $scope.usersList=result;
        
-        for(var i=0;i<$scope.usersList.length;i++)
-        {
-         if($scope.usersList[i].userName==$scope.userName && $scope.usersList[i].pwd==$scope.password)
-         {
-         loggedUserName=$scope.usersList[i].name;
-             break;
-         }
-        }
+       
+         loggedUserName=$scope.usersList.name; 
+        
         if(loggedUserName!=null){
+             document.getElementById('txt_Uname').value="";
+     document.getElementById('txt_Pwd').value="";
+             $ionicLoading.hide();
         alert("Welcome " + loggedUserName );
             userLoginMode = 'local';
+           
            // $state.go('tabs.task');
-            $state.go('tabs.home');
+            $state.go('main.dashboard.home');
         }
     }
-    function onGetUserRecord_failure(result)
-    {
-        alert("There was some issue. Please try again later");
-    }
+//    function onGetUserRecord_failure(result)
+//    {
+//        alert("There was some issue. Please try again later");
+//    }
 
 };
   // This is the success callback from the login method
@@ -151,7 +375,7 @@ console.log(sourcedata);
       if(loggedUserName!=null){
         alert("Welcome " + loggedUserName );
            userLoginMode = 'fb';
-            $state.go('tabs.home');
+            $state.go('main.dashboard.home');
         }
     }, function(fail){
       // Fail get profile info
@@ -211,7 +435,7 @@ console.log(sourcedata);
 						if(loggedUserName!=null){
         alert("Welcome " + loggedUserName );
            userLoginMode = 'fb';
-            $state.go('tabs.home');
+            $state.go('main.dashboard.home');
         }
 					}, function(fail){
 						// Fail get profile info
@@ -222,7 +446,7 @@ console.log(sourcedata);
                     if(loggedUserName!=null){
         alert("Welcome " + loggedUserName );
           userLoginMode = 'fb';
-            $state.go('tabs.home');
+            $state.go('main.dashboard.home');
         }
 					
 				}
@@ -240,33 +464,59 @@ console.log(sourcedata);
     });
   };
        
-    $scope.googlePlusLogin=function(){
-        $cordovaOauth.google("925864935347-n05icr3cqljfmq4aj5hbpsd8tl3nvcfh.apps.googleusercontent.com", ["email"]).then(function(result) {
-            $log.info(JSON.stringify(result));
-        $state.go('tabs.home');
-        }, function(error) {
-        alert('The login has failed');
-        });
-    }
+$scope.googleSignIn = function() {
+    $ionicLoading.show({
+      template: 'Logging in...'
+    });
+
+    window.plugins.googleplus.login(
+      {},
+      function (user_data) {
+        // For the purpose of this example I will store user data on local storage
+          
+          loggedUserName=user_data.displayName;
+//        UserService.setUser({
+//          userID: user_data.userId,
+//          name: user_data.displayName,
+//          email: user_data.email,
+//          picture: user_data.imageUrl,
+//          accessToken: user_data.accessToken,
+//          idToken: user_data.idToken
+//        });
+ if(loggedUserName!=null){
+        alert("Welcome " + loggedUserName );
+     userLoginMode='google';
+            $ionicLoading.hide();
+        $state.go('main.dashboard.home');
+        }
+     
+      },
+      function (msg) {
+        $ionicLoading.hide();
+      }
+    );
+  };
 
     $scope.redirectToRegistration=function()
     {
-    $state.go('tabs.register');
+    $state.go('register');
     };
 })
-
-
-app.controller('taskCtrlr',function($scope,$ionicPlatform,$cordovaLocalNotification,$ionicPopup,$ionicModal,$http){
-var index;
+.controller('taskCtrlr',function($scope,$ionicPlatform,$cordovaLocalNotification,$ionicPopup,$ionicModal,$http,$state,$log){
+   var userTaskFactory;
+    if(userTaskFactory==undefined && userTaskFactory==null)
+   userTaskFactory= getServiceFactory($http,$state,$log);
+        var userTaskServices = userTaskFactory.createService("userTask");
     $scope.tasks;
-    $http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
-		  method: "GET",
-		  contentType: "application/json"}).then(onGetUserTask_sucess,onGetUserTask_failure);
+//    $http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
+//		  method: "GET",
+//		  contentType: "application/json"}).then(onGetUserTask_sucess,onGetUserTask_failure);
+    userTaskServices.getUserTasks(onGetUserTask_sucess,onGetUserTask_failure);
       function onGetUserTask_sucess(result)
       {
-if(result!=null && result.data!=null){                    
-$scope.tasks=result.data;
-    index=($scope.tasks.length!=0)?$scope.tasks.length:1;
+if(result!=null && result!="Failure"){                    
+$scope.tasks=result;
+    
 }
       }
 function onGetUserTask_failure(result)
@@ -296,17 +546,26 @@ $ionicModal.fromTemplateUrl('templates/task-info.html',function(modal){
     // Called when the form is submitted
   $scope.createTask = function() {
     task ={};
+      var ID=assignIdToTask();
       task.title=document.getElementById('txt_title').value;
       task.descp=document.getElementById('txt_descp').value;
-      task.count=index++;
-      $http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
-		  data: JSON.stringify(task),
-		  method: "POST",
-		  contentType: "application/json"}).then(function sucess(result){onCreateUserTask_sucess(result,task);},onCreateUserTask_failure);
-      function onCreateUserTask_sucess(result,task)
+      task.count=ID;
+//      $http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
+//		  data: JSON.stringify(task),
+//		  method: "POST",
+//		  contentType: "application/json"}).then(function sucess(result){onCreateUserTask_sucess(result,task);},onCreateUserTask_failure);
+      userTaskServices.createTask(task,onCreateUserTask_sucess,onCreateUserTask_failure);
+      function onCreateUserTask_sucess(result)
       {
           alert("The task " +task.title + " has been created");
+          if($scope.tasks==undefined){
+          $scope.tasks= [{}];
+              $scope.tasks.push(task);
+              $scope.tasks.splice(0,1);
+          }
+          else{
           $scope.tasks.push(task);
+          }
             document.getElementById('txt_title').value='';//Resetting the values.##
       document.getElementById('txt_descp').value='';
            $scope.taskModal.hide();
@@ -322,7 +581,14 @@ function onCreateUserTask_failure(result)
       
    
   };
-    
+ function assignIdToTask()
+  {
+      var x= Math.floor((Math.random() * 200) + 1);
+      var y= Math.floor((Math.random() * 10) + 1);
+      var z= Math.floor((Math.random() * 10) + 1);
+      var Id = (x*y) - z;
+      return Id;
+  };
 $scope.updateTask=function(taskToBeUpdated)
 {
     if(taskToBeUpdated!=null){  
@@ -331,22 +597,22 @@ $scope.updateTask=function(taskToBeUpdated)
         //$scope.tasks[i]=taskToBeUpdated;
         var changedTitle = document.getElementById("txt_Changed_Title").value.toString();
         var changedDescp = document.getElementById("txt_Changed_Descp").value.toString();
-        $http( { url: 'https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs&q={"count":' +taskToBeUpdated.count +'}',
- data: JSON.stringify( { "$set" : { 'title' : changedTitle, 'descp': changedDescp } } ),	  
-method: "PUT",
-		  contentType: "application/json"}).then(onUpdateUserTask_sucess,onUpdateUserTask_failure);
+//        $http( { url: 'https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs&q={"count":' +taskToBeUpdated.count +'}',
+// data: JSON.stringify( { "$set" : { 'title' : changedTitle, 'descp': changedDescp } } ),	  
+//method: "PUT",
+//		  contentType: "application/json"}).then(onUpdateUserTask_sucess,onUpdateUserTask_failure);
+//        appUserServices.updateTask(changedTitle,changedDescp,taskToBeUpdated.count,onUpdateUserTask_sucess);
+userTaskServices.updateTask(changedTitle,changedDescp,taskToBeUpdated.count,onUpdateUserTask_sucess,onUpdateUserTask_failure);
       function onUpdateUserTask_sucess(result)
       {
-if(result.data!=null){                    
-//$scope.tasks[i]=result.data;
+if(result!=null){                    
    alert("The task " + changedTitle + " has been updated successfully.");    
      $scope.showModal.hide();
 }
       }
 function onUpdateUserTask_failure(result)
       {
-      alert("This task could not be updated. Please try again.");
-          
+      alert("This task could not be updated. Please try again.");         
       }
         
         break;
@@ -361,8 +627,9 @@ function onUpdateUserTask_failure(result)
     var taskToBeDeleted=getSelectedTask(taskIdToBeDeleted);
         if(taskToBeDeleted!=null)
         {
-                $http( { url: 'https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks/'+taskToBeDeleted._id.$oid +'?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs',
- method: "DELETE",contentType: "application/json"}).then(onDeleteUserTask_sucess,onDeleteUserTask_failure);
+//                $http( { url: 'https://api.mongolab.com/api/1/databases/travelguide/collections/userTasks/'+taskToBeDeleted._id.$oid +'?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs',
+// method: "DELETE",contentType: "application/json"}).then(onDeleteUserTask_sucess,onDeleteUserTask_failure);
+            userTaskServices.deleteTask(taskToBeDeleted.count,onDeleteUserTask_sucess,onDeleteUserTask_failure);
       function onDeleteUserTask_sucess(result)
       {
 if(result!=null){ 
@@ -374,7 +641,7 @@ if(result!=null){
       }
 function onDeleteUserTask_failure(result)
       {
-      alert("This task could not be deletedd. Please try again.");
+      alert("This task could not be deleted. Please try again.");
           
       }
         }
@@ -480,7 +747,7 @@ $scope.getNotificationIds();
 					
 					$ionicPopup.alert({
 						title: "Done",
-						template: "Your notification set for " + dateAndTimeToBeSet+ " seconds from now."
+						template: "Your notification set for " + dateAndTimeToBeSet
 					}).then(function(result) {
 						$scope.notifyModal.hide();
 						$scope.getNotificationIds();
@@ -509,8 +776,11 @@ $scope.getNotificationIds();
     });
      
 })
-app.controller('registrationCtrlr',function($scope,$state,$http){
-
+.controller('registrationCtrlr',function($scope,$state,$http,appUserServices){
+  var userServicesFactory;
+    if(userServicesFactory==undefined || userServicesFactory==null)
+   var userServicesFactory= getServiceFactory($http,$state,$log);
+        var userServices = userServicesFactory.createService("user");
     $scope.completeRegistration=function()
 {
         var userRecord={};
@@ -518,40 +788,54 @@ app.controller('registrationCtrlr',function($scope,$state,$http){
         userRecord.userName=document.getElementById('txt_uname').value;
         userRecord.pwd=document.getElementById('txt_pwd').value;
         userRecord.mobile=document.getElementById('txt_mobile').value;
+        if(userRecord!=null && userRecord.name!=null && userRecord.userName!=null && userRecord.pwd!=null)
+        userServices.registerUser(userRecord);
         
-        
-$http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/users?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
-		  data: JSON.stringify(userRecord),
-		  method: "POST",
-		  contentType: "application/json"}).then(function sucess(result){onUserRecord_sucess(result,userRecord);},function failure(result){onUserRecord_failure;});
+//$http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/users?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
+//		  data: JSON.stringify(userRecord),
+//		  method: "POST",
+//		  contentType: "application/json"}).then(function sucess(result){onUserRecord_sucess(result,userRecord);},function failure(result){onUserRecord_failure;});
+//
+//}
+//    function onUserRecord_sucess(result,userRecord)
+//    {
+//    alert("Thank you " + userRecord.name +". You can now login to the system using the username " + userRecord.userName + " and the password you provided");
+//    $state.go('tabs.login');
+//    }
+//    function onUserRecord_failure(result)
+//    {
+//    alert("There was some issue signing you up. Please try again after some time.");
+//    }
 
-}
-    function onUserRecord_sucess(result,userRecord)
-    {
-    alert("Thank you " + userRecord.name +". You can now login to the system using the username " + userRecord.userName + " and the password you provided");
-    $state.go('tabs.login');
     }
-    function onUserRecord_failure(result)
-    {
-    alert("There was some issue signing you up. Please try again after some time.");
+    $scope.goToLogin =function(){
+     $state.go('login');
     }
-
-
 })
-
-app.controller('homeCtrlr',function($scope,$scope, UserService, $ionicActionSheet, $state, $ionicLoading,$log)
-               {
+.controller('homeCtrlr',function($scope,$scope, UserService, $ionicActionSheet, $state, $ionicLoading,$log,$ionicHistory){
 $scope.openTasksToDo = function()
 {
-$state.go('tabs.task');
+$state.go('main.dashboard.task');
 }
 $scope.showWeather = function()
 {
-$state.go('tabs.weather');
+$state.go('main.dashboard.weather');
 }
 $scope.showTranslate=function()
 {
-$state.go('tabs.translator');
+$state.go('main.dashboard.translator');
+}
+$scope.Currency=function()
+{
+$state.go('main.dashboard.Currency');
+}
+$scope.Places=function()
+{
+$state.go('main.dashboard.Places');
+}
+$scope.Accomdation=function()
+{
+$state.go('main.dashboard.Accomdation');
 }
 
 
@@ -574,7 +858,9 @@ $scope.userLogout = function()
         }
         else if(userLoginMode=='google')
         {
-            $scope.showGoogleLogout();
+            $scope.showGoogleLogoutMenu();
+            
+     
         }
     }
 }
@@ -599,7 +885,7 @@ $scope.userLogout = function()
         facebookConnectPlugin.logout(function(){
           $ionicLoading.hide();
             userLoginMode="";
-          $state.go('tabs.login');
+          $state.go('login');
         },
         function(fail){
           $ionicLoading.hide();
@@ -607,6 +893,33 @@ $scope.userLogout = function()
 			}
 		});
 	}
+    $scope.showGoogleLogoutMenu = function() {
+		var hideSheet = $ionicActionSheet.show({
+			destructiveText: 'Logout',
+			titleText: 'Are you sure you want to logout?',
+			cancelText: 'Cancel',
+			cancel: function() {},
+			buttonClicked: function(index) {
+				return true;
+			},
+			destructiveButtonClicked: function(){
+				$ionicLoading.show({
+					template: 'Logging out...'
+				});
+				// Google logout
+				window.plugins.googleplus.logout(
+					function (msg) {
+						$log.info(msg);
+						$ionicLoading.hide();
+						$state.go('login');
+					},
+					function(fail){
+						$log.info(fail);
+					}
+				);
+			}
+		});
+	};
     
     $scope.showLogoutMenu =function()
     {
@@ -628,19 +941,18 @@ $scope.userLogout = function()
 
        userLoginMode="";
                  $ionicLoading.hide();
-          $state.go('tabs.login');
+          $state.go('login');
+                //$ionicHistory.goBack();
                 $log.info('The redirection logic is working');
 			}
 		})
     };
 
 })
-app.controller('tabsContrlr',function($scope,$state,$log)
-               {
+.controller('tabsContrlr',function($scope,$state,$log){
 $scope.goToHome=function()
 {
-$state.go('tabs.home');
+$state.go('main.dashboard.home');
 }
 });
-
 

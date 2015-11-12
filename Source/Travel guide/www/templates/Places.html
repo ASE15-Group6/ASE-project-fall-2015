@@ -1,0 +1,24 @@
+<ion-view title="TravelGuide">
+     <ion-header-bar class="bar-balanced">
+        <h1 class="title">Travel Guide</h1>
+        </ion-header-bar>
+    <ion-content padding="true" class="has-header">
+        
+<div class="list">
+  <div class="item item-input-inset">
+    <label class="item-input-wrapper">
+      <input  placeholder="Enter a location"  type="text" size="100"    id="pInput"/>
+    </label>
+ <button type="button"  ng_click="Places()" >Get Places</button>
+ </div>   
+      </div>
+<!--  <div class="container">-->
+    <!--            <div style="float:left" class="left" id="class" width:20%; ng-repeat="marker in markers | orderBy : 'title'">-->
+<!--
+    <div id="class" width:20% ng-repeat="marker in markers | orderBy : 'title'">
+      <a href="#" ng-click="openInfoWindow($event, marker)">{{marker.title}}</a> 
+    </div>
+-->
+    <div id="map"> </div>
+    </ion-content>
+</ion-view>
