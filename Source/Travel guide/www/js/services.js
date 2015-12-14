@@ -18,7 +18,7 @@ angular.module('services', [])
  var services=angular.module('services.UserServices',[])
  var userProfileURL="http://travelguideservices.mybluemix.net/userServices";
 
-function appUserServices($http,$state,$log)
+function appUserServices($http,$state,$log,$ionicLoading)
                  {
     return{
         registerUser:function(user){
@@ -46,6 +46,7 @@ function appUserServices($http,$state,$log)
                  $log.info(data);
                  $log.info(headers);
              alert("There was some problem. Please try again later");
+                 $ionicLoading.hide();
              });
     },
       

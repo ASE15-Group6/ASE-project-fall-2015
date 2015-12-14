@@ -1,6 +1,19 @@
-angular.module('starter.controllers', ['ionic','services.UserServices'])
+var app = angular.module('starter.controllers', ['ionic','services.UserServices'])
 
-.controller('LanguageTranslatorController', function($scope,$http) {
+app.controller('LanguageTranslatorController', function($scope,$http,$log) {
+    var recognition;
+    $scope.init= function()
+    {
+//        $log.info('Init method has been hit');
+//        recognition = new SpeechRecognition();
+//    recognition.onresult = function(event) {
+//        if (event.results.length > 0) {
+//             $log.info('The success method has been hit');
+//            SourceText.value = event.results[0][0].transcript;
+//            SourceText.form.submit();
+//        }
+//    }
+    }
    $scope.convertText =function()
           {
            var SourceText= document.getElementById("SourceText").value.toString();
@@ -15,11 +28,12 @@ angular.module('starter.controllers', ['ionic','services.UserServices'])
     url : 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20151023T145251Z.bf1ca7097253ff7e.c0b0a88bea31ba51f72504cc0cc42cf891ed90d2&text='+SourceText+'&lang='+SourceLanguage+'-'+DestinationLanguage+'&[format=plain]&[options=1]&[callback=set]',
     contentType: "application/json"
 }).success(function(response) {
+        $scope.convertedText = response.text;
     document.getElementById("DestinationText").value=response.text;
         });
 };   
 }) 
-.controller("CurrencyConverter", function ($scope, $http, $httpParamSerializerJQLike) {
+app.controller("CurrencyConverter", function ($scope, $http, $httpParamSerializerJQLike) {
 $scope.Currency = function() {
            var SourceValue=document.getElementById("SourceValue").value;
            var SourceCurrency = document.getElementById("SourceCurrency");
@@ -38,56 +52,47 @@ $http({
     
     BaseRate=TargetRate/SourceRate;    
     OutputValue=SourceValue*BaseRate;
-   
+   $scope.changedCurrency = OutputValue;
     document.getElementById("TargetValue").value=OutputValue;
         });
 }; })
-.controller("Accomdation", function ($scope, $http) {
-        var place;
+app.controller("Accomdation", function ($scope, $http) {
+
+        var accomodationPlace;
         var autocomplete;
-    var mapOptions = {
-        zoom: 2,
-        center: new google.maps.LatLng(39.0997, -94.5783),
+        var accomodationMapOptions = {
+        zoom: 3,
+        center: new google.maps.LatLng(39,3),
         mapTypeId: google.maps.MapTypeId.ROADMAP
     }
-
-
-    function setMarker(lati, longi)
+        $scope.map = new google.maps.Map(document.getElementById('accomodationMap'), accomodationMapOptions);
+    function accomodationSetMarker(lati, longi)
     {
-        var mapOptions = {
+         accomodationMapOptions = {
             zoom: 12,
             center: new google.maps.LatLng(lati, longi),
             mapTypeId: google.maps.MapTypeId.ROADMAP
+             
         }
-        $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        $scope.map = new google.maps.Map(document.getElementById('accomodationMap'), accomodationMapOptions);
     }
-
-
-    $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-    $scope.markers = [];
-
+    $scope.map = new google.maps.Map(document.getElementById('accomodationMap'), accomodationMapOptions);
+    $scope.accomodationMarkers = [];
     var infoWindow = new google.maps.InfoWindow();
-
     function createMarker(info){
-
         var marker = new google.maps.Marker({
             map: $scope.map,
             position: new google.maps.LatLng(info.position[0], info.position[1]),
-            title: info.title
-
+            title: info.title,
+            icon:'img/accomodation_marker.png'
         });
         marker.content = '<div class="infoWindowContent">' + info.vicinity + '</div>';
-
-        google.maps.event.addListener(marker, 'click', function(){
+        google.maps.event.addListener(marker, 'mousedown', function(){
             infoWindow.setContent('<h6>' + marker.title + '</h6>' + marker.content);
             infoWindow.open($scope.map, marker);
         });
-
-        $scope.markers.push(marker);
+        $scope.accomodationMarkers.push(marker);
     }  
-
-
     $scope.openInfoWindow = function(e, selectedMarker){
         e.preventDefault();
         google.maps.event.trigger(selectedMarker, 'click');
@@ -95,40 +100,37 @@ $http({
             var input = document.getElementById('placeInput');
             autocomplete = new google.maps.places.Autocomplete(input);
             google.maps.event.addListener(autocomplete, 'place_changed', function () {
-                 place = autocomplete.getPlace();
+            accomodationPlace = autocomplete.getPlace();
             });
         $scope.Accomdation = function() {       
-            place = autocomplete.getPlace();
-            var latitude = place.geometry.location.lat();
-            var longitude = place.geometry.location.lng();
+            accomodationPlace = autocomplete.getPlace();
+            if(accomodationPlace!=undefined && accomodationPlace!=null && accomodationPlace!=""){
+            var latitude = accomodationPlace.geometry.location.lat();
+            var longitude = accomodationPlace.geometry.location.lng();
             $http.get('http://places.cit.api.here.com/places/v1/discover/explore?at='+latitude+','+longitude+'&cat=accommodation&app_id=e40DqLGqSKIEpEmrrtlz&app_code=VdHvRq3QQeaevUZQrmTwWg&tf=plain&pretty=true')
                 .success(function(sourcedata){
-                setMarker(latitude,longitude);
-               // var content="";               
+                accomodationSetMarker(latitude,longitude);             
                 for(var i=0;i<sourcedata.results.items.length;i++)
                     {
                         createMarker(sourcedata.results.items[i]);
                     }
-//                document.getElementById("Accomdation").innerHTML=content;
+                //document.getElementById("accomodationMap").innerHTML=content;
                 console.log(sourcedata);
-            });       
+            }); 
+            }
         };    
     })
-.controller("Places", function ($scope, $http) {
-        var place;
-        var autocomplete;
+app.controller("Places", function ($scope, $http) {
     
-    var mapOptions = {
-        zoom: 2,
-        center: new google.maps.LatLng(39.0997, -94.5783),
+    var place;
+        var autocomplete;
+        var mapOptions = {
+        zoom: 3,
+        center: new google.maps.LatLng(39, 3),
         mapTypeId: google.maps.MapTypeId.ROADMAP
     }
-    
-     
-    
-    
-    
-    
+        $scope.map = new google.maps.Map(document.getElementById('placesMap'), mapOptions);
+
     function setMarker(lati, longi)
     {
         var mapOptions = {
@@ -136,48 +138,28 @@ $http({
             center: new google.maps.LatLng(lati, longi),
             mapTypeId: google.maps.MapTypeId.ROADMAP
         }
-        $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        $scope.map = new google.maps.Map(document.getElementById('placesMap'), mapOptions);
     }
     
-    
-    
-     
-    
-    
-
-   
-    $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-   
     $scope.markers = [];
-
     var infoWindow = new google.maps.InfoWindow();
-
     function createMarker(info){
-
         var marker = new google.maps.Marker({
             map: $scope.map,
             position: new google.maps.LatLng(info.position[0], info.position[1]),
-            title: info.title
+            title: info.title,
+            icon:'img/points-of-interest_marker.jpg'
             
         });
-    
-    
-   
-    
         marker.content = '<div class="infoWindowContent">' + info.vicinity + '</div>';
 
-        google.maps.event.addListener(marker, 'click', function(){
+        google.maps.event.addListener(marker, 'mousedown', function(){
             infoWindow.setContent('<h6>' + marker.title + '</h6>' + marker.content);
             infoWindow.open($scope.map, marker);
         });
 
         $scope.markers.push(marker);
     }  
-        
-        
-        
-    
-      
 
 
     $scope.openInfoWindow = function(e, selectedMarker){
@@ -185,18 +167,15 @@ $http({
         google.maps.event.trigger(selectedMarker, 'click');
     }
         
-
-    
             var input = document.getElementById('pInput');
             autocomplete = new google.maps.places.Autocomplete(input);
             google.maps.event.addListener(autocomplete, 'place_changed', function () {
                  place = autocomplete.getPlace();  
             });
-    
-    
         
         $scope.Places = function() {       
             place = autocomplete.getPlace();
+            if(place!=undefined && place!=null && place!=""){
             var latitude = place.geometry.location.lat();
             var longitude = place.geometry.location.lng();
             $http.get('http://places.cit.api.here.com/places/v1/discover/explore?at='+latitude+','+longitude+'&app_id=e40DqLGqSKIEpEmrrtlz&app_code=VdHvRq3QQeaevUZQrmTwWg&tf=plain&pretty=true')
@@ -207,17 +186,16 @@ $http({
                     {
                         createMarker(sourcedata.results.items[i]);    
                     }
-//     document.getElementById("Places").innerHTML=content;
-                console.log(sourcedata);
-            });     
+            });
+            }
         };    
-   
-        
-           
     })
-.controller('googlemapoutput', function ($scope,$http) {
+app.controller('googlemapoutput', function ($scope,$http) {
     var place;
     var autocomplete;
+    var latitude;
+    var longitude;
+    var locality;
     var input = document.getElementById('searchLocation');
     autocomplete = new google.maps.places.Autocomplete(input);
     google.maps.event.addListener(autocomplete, 'place_changed', function () {
@@ -225,82 +203,35 @@ $http({
     });
     $scope.getWeather = function() {  
         
-     var location = document.getElementById("searchLocation").value;
-        $http.get('http://api.openweathermap.org/data/2.5/forecast/daily?q='+location+'&mode=json&units=metric&cnt=7&appid=6592931011456bf7e824174e29720be8')
-.success(function(sourcedata){
-            graphArea.innerHTML=" ";
-            currentWeather.innerHTML= "<center>"+sourcedata.city.name+
-                                           "<br><br>"+sourcedata.list[0].temp.min+"<sup>o</sup> C<br>"
-                                            +sourcedata.list[0].weather[0].main+"</center>";
-            var cityName = sourcedata.city.name;
-            var longitude = sourcedata.city.coord.lon;
-            var latitude = sourcedata.city.coord.lat;
-            var myArray = [];
-            for(var i=0;i<sourcedata.list.length;i++)
-                {
-                    myArray.push({           
-                    dt:timeConverter(sourcedata.list[i].dt),
-                        //dt:sourcedata.list[i].dt,
-                    min:sourcedata.list[i].temp.min,
-                    max:sourcedata.list[i].temp.max,
-                   //humidity:sourcedata.list[i].humidity
-                    Main:sourcedata.list[i].weather[0].main
-                    });
-//                 alert(myArray[i]);
-                 }
-    graph(myArray);   
-
-function timeConverter(UNIX_timestamp){
-    var date = new Date(UNIX_timestamp*1000);
-
-    //date = new Date(date.setMonth(date.getMonth() + 1)*1000);
-    // var date = new Date(unix_timestamp*1000);
-    // hours part from the timestamp
-    var years = date.getFullYear();
-    // minutes part from the timestamp
-    var month = date.getMonth() +1;
-    //  alert(month);
-    // seconds part from the timestamp
-    var mydate = date.getDate();
-    // will display time in 10:30:23 format
-    var formattedTime = years + '-' + month + '-' + mydate;        
-
-    return ''+formattedTime+'';   
-
-}
-     
-function graph(myArray){
-     Morris.Line({
-        element:'graphArea',
-        data: myArray,
-        xkey:"dt",
-        ykeys:['min', 'max'],
-        labels: ['Minimum', 'Maximum'],
-        xLabelFormat:function (d)
-         { 
-             return d.getDate()
-         },
-        lineColors:['blue','red'],
-        lineWidth:1,
-        pointSize:2,
-        resize:true,
-        grid:false,
-        ymin:'auto',
-        xLabels:'day',
-        xLabelAngle: 45,
-        resize:true,
-         hideHover:'true'
-        //postUnits:'C'
-     });    
-}
-console.log(sourcedata);
-})       
-.error(function(error){
-       
+        place = autocomplete.getPlace();
+        if(place!=undefined && place!=null && place!=""){
+        latitude = place.geometry.location.lat();
+        longitude = place.geometry.location.lng();
+   
+        if(place.address_components!=null)
+        {
+        for(var i=0 ;i < place.address_components.length;i++)
+    {
+        if(place.address_components[i].types!=null)
+        {
+        for(var j=0;j<place.address_components[i].types.length;j++)
+        {
+            
+            if(place.address_components[i].types[j]=="locality")
+            {
+                locality=place.address_components[i].long_name;
+                break;
+            }
+        }
+        }
+    }
+        }
+            document.getElementById("currentWeather").innerHTML = "<iframe id='forecast_embed' width='500' type='text/html' frameborder='0' height='245' src='http://forecast.io/embed/#lat=" + latitude + "&lon=" + longitude + "&name=" + locality + "&color=#00aaff&font=Georgia&units=us'> </iframe>";
+            document.getElementById("currentWeather").classList.remove('hide');
+        }
+    }
 })
-};    
-})
-.controller('loginCtrl', function($scope, $state, $q, UserService, $ionicLoading,$log,$state,$http,$cordovaOauth) {
+app.controller('loginCtrl', function($scope, $state, $q, UserService, $ionicLoading,$log,$state,$http,$cordovaOauth) {
      var loggedUserName;
      var userServicesFactory;
     if(userServicesFactory==undefined || userServicesFactory==null)
@@ -318,7 +249,7 @@ console.log(sourcedata);
     $scope.password= document.getElementById('txt_Pwd').value;
        //
           }
-    if($scope.userName!=null && $scope.password!=null){
+    if($scope.userName!=null && $scope.password!=null && $scope.userName!="" && $scope.password!=""){
 //    $http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/users?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
 //		  method: "GET",
 //		  contentType: "application/json"}).then(onGetUserRecord_sucess,onGetUserRecord_failure);
@@ -502,7 +433,7 @@ $scope.googleSignIn = function() {
     $state.go('register');
     };
 })
-.controller('taskCtrlr',function($scope,$ionicPlatform,$cordovaLocalNotification,$ionicPopup,$ionicModal,$http,$state,$log){
+app.controller('taskCtrlr',function($scope,$ionicPlatform,$cordovaLocalNotification,$ionicPopup,$ionicModal,$http,$state,$log){
    var userTaskFactory;
     if(userTaskFactory==undefined && userTaskFactory==null)
    userTaskFactory= getServiceFactory($http,$state,$log);
@@ -776,8 +707,11 @@ $scope.getNotificationIds();
     });
      
 })
-.controller('registrationCtrlr',function($scope,$state,$http,appUserServices){
+app.controller('registrationCtrlr',function($scope,$state,$http,$log,$cordovaFileTransfer,$ionicLoading){
   var userServicesFactory;
+    var API_URL = "https://gateway.watsonplatform.net/visual-recognition-beta/api";
+var API_USER = "dfab3d3f-d4d0-44cf-a516-fa22f83ebdda";
+var API_PASSWORD = "NR10gnp3Q7aF";
     if(userServicesFactory==undefined || userServicesFactory==null)
    var userServicesFactory= getServiceFactory($http,$state,$log);
         var userServices = userServicesFactory.createService("user");
@@ -790,29 +724,137 @@ $scope.getNotificationIds();
         userRecord.mobile=document.getElementById('txt_mobile').value;
         if(userRecord!=null && userRecord.name!=null && userRecord.userName!=null && userRecord.pwd!=null)
         userServices.registerUser(userRecord);
-        
-//$http( { url: "https://api.mongolab.com/api/1/databases/travelguide/collections/users?apiKey=1iwTCrjgXRLz-tbL9nznRtZRB5K9p_Zs",
-//		  data: JSON.stringify(userRecord),
-//		  method: "POST",
-//		  contentType: "application/json"}).then(function sucess(result){onUserRecord_sucess(result,userRecord);},function failure(result){onUserRecord_failure;});
-//
-//}
-//    function onUserRecord_sucess(result,userRecord)
-//    {
-//    alert("Thank you " + userRecord.name +". You can now login to the system using the username " + userRecord.userName + " and the password you provided");
-//    $state.go('tabs.login');
-//    }
-//    function onUserRecord_failure(result)
-//    {
-//    alert("There was some issue signing you up. Please try again after some time.");
-//    }
+
 
     }
     $scope.goToLogin =function(){
      $state.go('login');
     }
+    
+     function uploadWin(res) {
+       // alert("The start of the method is hit");
+         var humanCaptchaFlag=false;
+         var result;
+        var data = JSON.parse(res.response);
+        var labels = data.images[0].labels;
+         if(labels!=undefined && labels!=null && labels.length>0){
+        for(var len=0; len<labels.length;len++) {
+            result += "<b>"+labels[len].label_name + "</b><br/>";  
+            if(labels[len]!=undefined && labels[len]!=null && labels[len].label_name!=null){
+            if(labels[len].label_name.toString().toUpperCase()=="FACE" || labels[len].label_name.toString().toUpperCase()=="HUMAN")
+            {
+                humanCaptchaFlag=true;
+            }
+            }
+        }
+         }
+         if(humanCaptchaFlag)
+         {
+             if(document.getElementById('btn_SignUp').classList.contains('hide'))
+             {
+                 alert('From your image it seems you are not a robot');
+             document.getElementById('btn_SignUp').classList.remove('hide');
+             document.getElementById('btn_Camera').classList.add('hide');
+                 $("#userImage").hide();
+             }
+             
+         }
+         else
+         {
+             alert("You are either an alien or robot. Please retry");
+         }
+           $ionicLoading.hide();
+        console.log(result); 
+        //$("#status").html(result);
+    }
+    
+    function uploadFail(message) {
+        alert("Upload failed" + message);
+         $ionicLoading.hide();
+        console.log(JSON.stringify(message));
+        console.dir(arguments);
+    }
+    
+    //Credit: http://stackoverflow.com/a/14313052/52160
+    function authHeaderValue(username, password) {
+        var tok = username + ':' + password;
+        var hash = btoa(tok);
+        return "Basic " + hash;
+    };
+    
+	function onCamSuccess(imageData) {
+		var image = document.getElementById('myImage');
+        $("#userImage").attr("src", imageData);
+        $("#userImage").css("height","200px");
+        $("#userImage").css("width","200px");
+
+       // $("#status").html("<i>Uploading picture for BlueMix analysis...</i>");
+        $ionicLoading.show({
+                    template:'<img src="img/imageProcesing.gif">'     //'Please wait we are analyzing your pic...'
+                });
+        var options = new FileUploadOptions();
+        options.fileKey = "img_file";
+        options.fileName = imageData.substr(imageData.lastIndexOf('/') + 1);
+        options.chunkedMode=false;
+        options.headers = {'Authorization': authHeaderValue(API_USER, API_PASSWORD) };
+        options.mimeType = "image/jpg";
+        var ft = new FileTransfer();
+        var url = encodeURI(API_URL+"/v1/tag/recognize");
+        //alert("Uname = " + API_USER + "  password= " + API_PASSWORD + " hashedValue = "+ options.headers );
+        ft.upload(imageData, url, uploadWin, uploadFail, options);
+        //$cordovaFileTransfer.upload(imageData, url, options).then(uploadWin, uploadFail);
+
+    }
+
+	function onCamFail(message) {
+		alert('Failed because: ' + message);
+	}	
+    
+    //Touch handlers for the two buttons, one uses lib, one uses cam
+    $scope.pictureCollect =  function($event) {
+        var source =Camera.PictureSourceType.CAMERA;
+        
+		navigator.camera.getPicture(onCamSuccess, onCamFail, { 
+			quality: 50,
+			sourceType: source,
+			destinationType: Camera.DestinationType.FILE_URI
+		});
+
+    };
+        $scope.getImageResults = function() {
+            var searchURL = document.getElementById('txt_URL').value;
+            if(searchURL!=null){
+        var url= 'http://userinteractionservice.mybluemix.net/api/Alchemy/search/URLGetRankedImageFaceTags/'+searchURL;
+        console.log(url);
+                
+        $http.get(url) 
+            .success(function(data) { 
+                console.log(data);
+                if(data!=null && data.gender!=null)
+                {
+                    if((data.gender.toUpperCase()=="MALE" || data.gender.toUpperCase()=="FEMALE"))
+                    {                    
+                        var gender = data.gender.toString();
+                        var ageRange = data.ageRange.toString();
+                        if(ageRange!=null)
+                        alert('You are a' + gender + 'between' + ageRange.split('-')[0]+'and'+ ageRange.split('-')[0] +'years. Please proceed with signup.');
+                    }
+                    else 
+                    {
+                        alert('You are either a robot or alien.');
+                    }
+                }
+            }) 
+            .error(function(err) { 
+                console.log("data not received from url");
+            }); 
+            }
+        }
+   
 })
-.controller('homeCtrlr',function($scope,$scope, UserService, $ionicActionSheet, $state, $ionicLoading,$log,$ionicHistory){
+
+app.controller('homeCtrlr',function($scope,$scope, UserService, $ionicActionSheet, $state, $ionicLoading,$log,$ionicHistory)
+               {
 $scope.openTasksToDo = function()
 {
 $state.go('main.dashboard.task');
@@ -949,10 +991,9 @@ $scope.userLogout = function()
     };
 
 })
-.controller('tabsContrlr',function($scope,$state,$log){
+app.controller('tabsContrlr',function($scope,$state,$log){
 $scope.goToHome=function()
 {
 $state.go('main.dashboard.home');
 }
 });
-

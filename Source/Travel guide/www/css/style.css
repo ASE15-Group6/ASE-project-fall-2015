@@ -1,1 +1,71 @@
 /* Empty. Add your own CSS if you like */
+.scroll-content{
+    background: url("../img/main_page_bg.jpg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+
+}
+.image_icon
+{
+height:80px;
+    margin:5px 5px 5px 5px;
+    width:80px;
+}
+#div_Home_Container{
+margin-top:30px;
+margin-left:10px  
+    
+
+}
+
+.scroll-content{
+    background: url("../img/main_page_bg.jpg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    overflow-y: scroll;
+
+}
+.image-shape{
+border-radius : 25px;
+}
+
+.button-shape{
+border-radius : 15px;
+}
+#imgDisplay {
+    max-width:100%;
+    max-height: 200px;
+}
+
+.hide{
+display:none;
+}
+
+#userImage{
+height:50px;
+width:50px;
+}
+
+.infoWindowContent {
+  font-size:  10px;
+  border-top: 0.1px solid #ccc;
+  padding-top: 1px;
+}
+#placesMap {
+  position:absolute;  
+  height:550%; 
+  width:125%;
+}
+#accomodationMap {
+  position:absolute;  
+  height:550%; 
+  width:125%;
+}
+
+        #currentWeather {
+        background-color:rgba(188, 191, 195, 0.59); 
+            border-radius: 10px;
+            
+    }

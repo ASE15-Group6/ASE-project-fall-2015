@@ -1,40 +1,36 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title></title>
-    <style>
-      .angular-google-map-container {
-          width: 100%;
-          height: 504px;
-      }
-        #graphArea {
-        background-color:rgba(218, 241, 242, 0.96);  
-            border-radius: 10px;
-    }
-        #currentWeather {
-        background-color:rgba(10, 250, 204, 0.42); 
-            border-radius: 10px;
-    }
-    </style>
-</head>
-<body ng-app="app" animation="slide-left-right-ios7" ng-controller="googlemapoutput">
-<ion-view title="Weather">
-     <ion-header-bar class="bar-balanced">
+
+<ion-view title="Weather" cache-view="false" ng-controller="googlemapoutput">
+     <ion-header-bar class="bar-positive">
         <h1 class="title">Travel Guide</h1>
         </ion-header-bar>
-    <ion-content padding="true" class="has-header has-footer">
-        <form>            
+    <ion-content padding="true" class="has-header">
+        <form>  
+            <div class="list">
+  <div class="item item-input-inset">
+    <label class="item-input-wrapper">
+        
+      <input  placeholder="Enter a location"  type="search" size="150" id="searchLocation"/>
+         
+    </label>
+        <button type="button" class="button button-icon" ng-click="getWeather()">
+    <i class="icon ion-search placeholder-icon" ></i>
+     
+        </button>
+     
+<!-- <button type="button"  ng_click="Accomdation()" >Find Accomodation</button>-->
+  </div>              
+</div>
+<!--
             <label class="item item-input">
-                <i class="icon ion-search placeholder-icon"></i>
-                <input type="search" placeholder="" id="searchLocation">
+             <input type="search" placeholder="Enter a place" id="searchLocation">
+                <i class="icon ion-search placeholder-icon" ng-click="getWeather()"></i>
             </label>
-            <button class="button button-stable button-block button-shape" ng-click="getWeather()">Check Weather</button>
+-->
+             
+<!--            <button class="button button-stable button-block button-shape" >Check Weather</button>-->
         </form>
-        <div id="currentWeather"><center>Current Weather</center></div> 
-        <div id="graphArea" ></div>
+        <div class="row hide" id="currentWeather" style="width='100%' overflow='100'"></div>
+         
     </ion-content>
 </ion-view>
-  </body>
-</html>

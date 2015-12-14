@@ -1,14 +1,21 @@
-<ion-view title="TravelGuide">
-     <ion-header-bar class="bar-balanced">
+<ion-view title="TravelGuide" cache-view="false" ng-init="init()">
+     <ion-header-bar class="bar-positive">
         <h1 class="title">Travel Guide</h1>
         </ion-header-bar>
     <ion-content padding="true" class="has-header">
+      
+
         <div class="list">
   <div class="item item-input-inset">
     <label class="item-input-wrapper">
-      <textarea rows="5" cols="210" placeholder="Enter Text" id="SourceText"></textarea>
+      <textarea rows="4" cols="220" placeholder="Enter Text" id="SourceText">
+       
+        </textarea>
+           
     </label>
-   <select id="SourceLanguage">
+      
+          
+      <select id="SourceLanguage">
                 <option value="en" selected="true">English</option>
                       <option value="ar">Arabic</option>
                       <option value="bg">Bulgarian</option>
@@ -33,14 +40,17 @@
                       <option value="sv">Swedish</option>
                       <option value="ja">Japanese</option>
     </select>
-  </div>              
+      
+  </div>  
+           
 </div>
 <div class="list">
   <div class="item item-input-inset">
     <label class="item-input-wrapper">
-             <textarea rows="5" cols="210" placeholder="Translated Text" id="DestinationText" disabled=""></textarea>
+             <textarea rows="4" cols="150" placeholder="Translated Text" id="DestinationText" disabled="" ></textarea>
     </label>
-   <select id="DestinationLanguage">
+     
+   <select id="DestinationLanguage" ng-change="convertText()" ng-model="convertedText">
                <option value="en" >English</option>
                       <option value="ar">Arabic</option>
                       <option value="bg">Bulgarian</option>
@@ -55,7 +65,7 @@
                       <option value="zh">Chinese</option>
                       <option value="ko">Korean</option>
                       <option value="la">Latin</option>
-                      <option value="de" selected="true">German</option>
+                      <option value="de">German</option>
                       <option value="fa">Persian</option>
                       <option value="pt">Portuguese</option>
                       <option value="th">Thai</option>
@@ -67,6 +77,7 @@
     </select>
   </div>              
 </div> 
-         <button type="button" class="button button-royal button-block" ng-click="convertText()">Translate</button>
+    
     </ion-content>
 </ion-view>
+
