@@ -1,28 +1,28 @@
 <ion-view name="dashboardTabs" cache-view="false">
 <ion-tabs class="tabs-icon-top tabs-color-active-positive" ng-controller="tabsContrlr">
 
-    <ion-tab title="Home" icon-off="ion-ios-home-outline" icon-on="ion-ios-home-outline" ng-click="goToHome()">
+    <ion-tab title="Home" icon-off="ion-ios-home-outline" icon-on="ion-ios-home" ng-click="goToHome()">
     
       <ion-nav-view name="Home"></ion-nav-view>
     </ion-tab>
-     <ion-tab title="Task" icon-off="ion-clipboard" icon-on="ion-clipboard">
+     <ion-tab title="Task" icon-off="ion-ios-list-outline" icon-on="ion-ios-list" ng-click="goToTask()">
    
          <ion-nav-view name="Task"></ion-nav-view>
   </ion-tab>
-    <ion-tab title="Translator" icon-off="ion-ios-toggle-outline" icon-on="ion-ios-toggle-outline">
+    <ion-tab title="Translator" icon-off="ion-ios-toggle-outline" icon-on="ion-ios-toggle" ng-click="goToTranslate()">
    
          <ion-nav-view name="Translator"></ion-nav-view>
   </ion-tab>
-     <ion-tab title="Weather" icon-off="ion-earth" icon-on="ion-earth">
+     <ion-tab title="Weather" icon-off="ion-ios-partlysunny-outline" icon-on="ion-ios-partlysunny" ng-click="goToWeather()">
          <ion-nav-view name="Weather" ></ion-nav-view>         
   </ion-tab>
-       <ion-tab title="Currency" icon-off="ion-social-usd" icon-on="ion-social-usd-outline">
+       <ion-tab title="Currency" icon-off="ion-social-usd-outline" icon-on="ion-social-usd" ng-click="goToCurrency()">
          <ion-nav-view name="Currency"></ion-nav-view>         
   </ion-tab>
-    <ion-tab title="Places" icon-off="ion-model-s" icon-on="ion-model-s">
+    <ion-tab title="Places" icon-off="ion-ios-navigate-outline" icon-on="ion-ios-navigate" ng-click="goToPlaces()">
       <ion-nav-view name="Places" cache-view="false"></ion-nav-view>         
   </ion-tab>
-     <ion-tab title="Accomdation" icon-off="ion-android-restaurant" icon-on="ion-android-restaurant">
+     <ion-tab title="Accomdation" icon-off="ion-android-restaurant" icon-on="ion-android-restaurant" ng-click="goToAccomodation()">
        <ion-nav-view name="Accomdation" cache-view="false"></ion-nav-view>         
   </ion-tab>
 </ion-tabs>

@@ -1,6 +1,9 @@
 <ion-view title="TravelGuide" cache-view="false" ng-init="init()">
      <ion-header-bar class="bar-positive">
         <h1 class="title">Travel Guide</h1>
+           <button class="button button-icon" ng-click="goToHome()">
+        <i class="icon ion-ios-home-outline"></i>
+      </button> 
         </ion-header-bar>
     <ion-content padding="true" class="has-header">
       
@@ -8,7 +11,7 @@
         <div class="list">
   <div class="item item-input-inset">
     <label class="item-input-wrapper">
-      <textarea rows="4" cols="220" placeholder="Enter Text" id="SourceText">
+      <textarea rows="4" cols="220" placeholder="Enter Text" id="SourceText" ng-change= "convertText()" ng-model="sourceLang">
        
         </textarea>
            

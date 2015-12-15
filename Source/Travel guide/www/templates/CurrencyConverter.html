@@ -1,14 +1,17 @@
 <ion-view title="TravelGuide" cache-view="false">
     <ion-header-bar class="bar-positive">
         <h1 class="title">Travel Guide</h1>
+          <button class="button button-icon" ng-click="goToHome()">
+        <i class="icon ion-ios-home-outline"></i>
+      </button> 
         </ion-header-bar>
     <ion-content padding="true" class="has-header"> 
 <div class="list">
   <div class="item item-input-inset">
     <label class="item-input-wrapper">
-      <input  placeholder="0.00"  type="number"  id="SourceValue"/>
+      <input  placeholder="0.00"  type="number" id="SourceValue" />
     </label>
-   <select name="SourceCurrency" id="SourceCurrency" class="form-control" >
+   <select name="SourceCurrency" id="SourceCurrency" class="form-control" ng-change="Currency()" ng-model="sourceCurrency" >
                 <option value="AUD">Australia Dollar</option>
                 <option value="BGN">Bulgaria Lev</option>
 				<option value="BRL">Brazil Real</option>

@@ -2,6 +2,7 @@ var app = angular.module('starter.controllers', ['ionic','services.UserServices'
 
 app.controller('LanguageTranslatorController', function($scope,$http,$log) {
     var recognition;
+    
     $scope.init= function()
     {
 //        $log.info('Init method has been hit');
@@ -14,11 +15,16 @@ app.controller('LanguageTranslatorController', function($scope,$http,$log) {
 //        }
 //    }
     }
+    $scope.goToHome=function()
+{
+$state.go('main.dashboard.home');
+}
    $scope.convertText =function()
           {
            var SourceText= document.getElementById("SourceText").value.toString();
            var SourceLanguage = document.getElementById("SourceLanguage");
            SourceLanguage=SourceLanguage.options[SourceLanguage.selectedIndex].value;
+            $scope.sourceLang = SourceLanguage;
             var DestinationText=document.getElementById("DestinationText").value.toString();
             var DestinationLanguage = document.getElementById("DestinationLanguage");
             DestinationLanguage =DestinationLanguage.options[DestinationLanguage.selectedIndex].value;
@@ -34,10 +40,17 @@ app.controller('LanguageTranslatorController', function($scope,$http,$log) {
 };   
 }) 
 app.controller("CurrencyConverter", function ($scope, $http, $httpParamSerializerJQLike) {
-$scope.Currency = function() {
+ $scope.sourceCurrency = 'USD';
+    $scope.goToHome=function()
+{
+$state.go('main.dashboard.home');
+}
+    $scope.Currency = function() {
+    
            var SourceValue=document.getElementById("SourceValue").value;
            var SourceCurrency = document.getElementById("SourceCurrency");
            SourceCurrency=SourceCurrency.options[SourceCurrency.selectedIndex].value;
+   
            var TargetCurrency = document.getElementById("TargetCurrency");
            TargetCurrency =TargetCurrency.options[TargetCurrency.selectedIndex].value;
 $http({
@@ -118,7 +131,11 @@ app.controller("Accomdation", function ($scope, $http) {
                 console.log(sourcedata);
             }); 
             }
-        };    
+        };  
+    $scope.goToHome=function()
+{
+$state.go('main.dashboard.home');
+};
     })
 app.controller("Places", function ($scope, $http) {
     
@@ -188,7 +205,11 @@ app.controller("Places", function ($scope, $http) {
                     }
             });
             }
-        };    
+        }; 
+    $scope.goToHome=function()
+{
+$state.go('main.dashboard.home');
+};
     })
 app.controller('googlemapoutput', function ($scope,$http) {
     var place;
@@ -229,7 +250,12 @@ app.controller('googlemapoutput', function ($scope,$http) {
             document.getElementById("currentWeather").innerHTML = "<iframe id='forecast_embed' width='500' type='text/html' frameborder='0' height='245' src='http://forecast.io/embed/#lat=" + latitude + "&lon=" + longitude + "&name=" + locality + "&color=#00aaff&font=Georgia&units=us'> </iframe>";
             document.getElementById("currentWeather").classList.remove('hide');
         }
-    }
+    };
+    
+    $scope.goToHome=function()
+{
+$state.go('main.dashboard.home');
+};
 })
 app.controller('loginCtrl', function($scope, $state, $q, UserService, $ionicLoading,$log,$state,$http,$cordovaOauth) {
      var loggedUserName;
@@ -705,6 +731,10 @@ $scope.getNotificationIds();
 
    
     });
+    $scope.goToHome = function()
+    {
+       $state.go('main.dashboard.home'); 
+    };
      
 })
 app.controller('registrationCtrlr',function($scope,$state,$http,$log,$cordovaFileTransfer,$ionicLoading){
@@ -995,5 +1025,35 @@ app.controller('tabsContrlr',function($scope,$state,$log){
 $scope.goToHome=function()
 {
 $state.go('main.dashboard.home');
-}
+};
+$scope.goToTask = function()
+{
+     $state.go('main.dashboard.task');
+    
+};
+    $scope.goToTranslate = function()
+{
+       $state.go('main.dashboard.translator');
+};
+
+    $scope.goToWeather = function()
+{
+        $state.go('main.dashboard.weather');
+};
+
+    $scope.goToCurrency = function()
+{
+        $state.go('main.dashboard.Currency');
+};
+
+    $scope.goToPlaces = function()
+{
+        $state.go('main.dashboard.Places');
+};
+    $scope.goToAccomodation = function()
+{
+        $state.go('main.dashboard.Accomdation');
+};
+    
+
 });
